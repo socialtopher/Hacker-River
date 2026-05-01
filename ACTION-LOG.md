@@ -78,3 +78,20 @@ Verification performed:
 
 Remaining risks or follow-ups:
 - Roadmap items are proposals only; the service-worker and background-task ideas need implementation-time browser support checks before shipping.
+
+## 2026-04-30 - Post-merge validation
+
+Summary of changes:
+- Fast-forward merged `night-work` into local `main`.
+- Attempted local runtime validation after merge.
+
+Files changed:
+- `ERRORS.md`
+
+Verification performed:
+- `git merge --ff-only night-work`
+- Attempted `npm run dev -- --host 127.0.0.1 --port 4173`
+- Attempted browser inspection via Playwright MCP
+
+Remaining risks or follow-ups:
+- Deployment and live-site validation remain blocked until someone pushes `main` and checks the built site.
