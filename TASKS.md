@@ -6,7 +6,7 @@ You are working on **Hacker River**, an application owned by Chris.
 
 Your job is to make meaningful, reviewable progress while I am away/asleep. Work carefully, keep changes focused, and leave the project in a better state than you found it. Be brief. 
 
-Do not make broad rewrites unless explicitly instructed. Prefer small, safe, incremental improvements that can be reviewed and merged confidently.
+Do not make broad rewrites unless explicitly instructed. Prefer small, safe, incremental improvements that can be reviewed and merged confidently. Once a task is complete, remove from open tasks and add to a new section below called Closed Tasks.
 
 ---
 
