@@ -93,30 +93,35 @@ h1 {
   display: grid;
   grid-template-columns: 24px 28px minmax(0, 1fr);
   column-gap: 4px;
+  align-items: start;
   padding: 4px 0 7px;
 }
 
 .post::before {
   content: counter(river-item) ".";
   grid-column: 2;
+  grid-row: 1;
   color: #828282;
+  line-height: 24px;
   text-align: right;
 }
 
 .post-body {
   grid-column: 3;
+  grid-row: 1;
   min-width: 0;
 }
 
 .dismiss-button {
   grid-column: 1;
+  grid-row: 1;
   width: 24px;
   height: 24px;
   border: 0;
   background: transparent;
   color: #828282;
   cursor: pointer;
-  line-height: 1;
+  line-height: 24px;
 }
 
 .dismiss-button:hover,
@@ -129,6 +134,7 @@ h1 {
   min-height: 44px;
   padding: 0;
   color: #000;
+  line-height: 24px;
   text-decoration: none;
 }
 
