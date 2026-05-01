@@ -27,9 +27,9 @@ export function buildFeed(
 ): HnItem[] {
   return items
     .filter((item) => item && !item.dead && !item.deleted && item.type === 'story' && item.title)
-    .filter((item) => isUntappedVisible(ledger[String(item.id)], now, unseenTtlMs))
     .sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || b.time - a.time)
-    .slice(0, maxItems);
+    .slice(0, maxItems)
+    .filter((item) => isUntappedVisible(ledger[String(item.id)], now, unseenTtlMs));
 }
 
 export function findNewIds(ids: number[], ledger: SeenLedger): number[] {

@@ -49,6 +49,18 @@ describe('feed construction', () => {
     expect(buildFeed([story(1, 100, 1)], ledger, now, 10)).toEqual([]);
   });
 
+  it('does not backfill capped feed items after stories are hidden', () => {
+    const now = new Date('2026-04-30T14:00:00Z');
+    const ledger: SeenLedger = {
+      '1': { firstSeen: '2026-04-30T13:59:00Z', tapped: false, dismissed: true, dismissedAt: '2026-04-30T13:59:30Z' },
+      '2': { firstSeen: '2026-04-30T13:59:00Z', tapped: true, tappedAt: '2026-04-30T13:59:30Z' },
+    };
+
+    expect(buildFeed([story(1, 100, 1), story(2, 90, 2), story(3, 80, 3), story(4, 70, 4)], ledger, now, 3).map((item) => item.id)).toEqual([
+      3,
+    ]);
+  });
+
   it('diffs fetched ids against the ledger for background refresh banners', () => {
     const ledger: SeenLedger = {
       '1': { firstSeen: '2026-04-30T13:00:00Z', tapped: false },

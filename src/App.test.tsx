@@ -211,6 +211,7 @@ describe('Hacker River app', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /More/ }));
 
+    expect(screen.getByRole('heading', { name: 'Hacker River (1)' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Story 1 (example.com)' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Story 31 (example.com)' })).toBeInTheDocument();
     const ledger = JSON.parse(localStorage.getItem('hackerriver_ledger') ?? '{}');
