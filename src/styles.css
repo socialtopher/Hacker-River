@@ -1,0 +1,187 @@
+:root {
+  color: #000;
+  background: #f6f6ef;
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 13px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f6f6ef;
+}
+
+button,
+select {
+  font: inherit;
+}
+
+.shell {
+  width: min(100%, 85ch);
+  min-height: 100vh;
+  margin: 0 auto;
+  background: #f6f6ef;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 0 8px;
+  background: #ff6600;
+}
+
+h1 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.toolbar {
+  display: flex;
+  gap: 4px;
+}
+
+.icon-button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.new-banner,
+.toast,
+.empty {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 10px;
+  border: 0;
+  border-bottom: 1px solid #e2e2d5;
+  background: #fff4d9;
+  color: #000;
+  text-align: left;
+}
+
+.toast {
+  background: #ffe3d8;
+}
+
+.empty {
+  color: #828282;
+  background: transparent;
+}
+
+.feed,
+.recent-list {
+  margin: 0;
+  padding: 10px 8px 12px 34px;
+}
+
+.post {
+  padding: 4px 0 7px;
+}
+
+.title-link {
+  display: inline;
+  min-height: 44px;
+  padding: 0;
+  color: #000;
+  text-decoration: none;
+}
+
+.title-link:visited,
+.recent a {
+  color: #828282;
+}
+
+.domain,
+.meta,
+.meta a,
+.recent-list span {
+  color: #828282;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+}
+
+.meta a {
+  text-decoration: none;
+}
+
+.recent {
+  border-top: 1px solid #e2e2d5;
+  padding-bottom: 24px;
+}
+
+.recent-toggle {
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 10px;
+  border: 0;
+  background: transparent;
+  color: #000;
+  text-align: left;
+  cursor: pointer;
+}
+
+.recent-list {
+  padding-top: 0;
+}
+
+.recent-list li {
+  padding: 5px 0;
+}
+
+.settings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #e2e2d5;
+  background: #fff8e8;
+}
+
+.settings label,
+.source-grid {
+  display: grid;
+  gap: 5px;
+  color: #828282;
+  font-size: 12px;
+}
+
+.settings select {
+  min-height: 36px;
+}
+
+.source-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-content: start;
+}
+
+.source-grid label {
+  display: flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 4px;
+  color: #000;
+}
+
+@media (max-width: 600px) {
+  :root {
+    font-size: 14px;
+  }
+
+  .feed {
+    padding-left: 30px;
+  }
+
+  .post {
+    padding-bottom: 10px;
+  }
+}

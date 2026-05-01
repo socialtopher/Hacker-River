@@ -1,0 +1,58 @@
+import { ITEM_CACHE_PREFIX } from './constants';
+import { mergeStoryIds } from './feed';
+import type { HnItem, Settings, StorySource } from '../types';
+
+const BASE_URL = 'https://hacker-news.firebaseio.com/v0';
+
+const ENDPOINTS: Record<StorySource, string> = {
+  top: 'topstories',
+  new: 'newstories',
+  ask: 'askstories',
+  show: 'showstories',
+  job: 'jobstories',
+};
+
+async function fetchJson<T>(url: string, retries = 2): Promise<T> {
+  const response = await fetch(url);
+  if ((response.status === 429 || response.status >= 500) && retries > 0) {
+    await new Promise((resolve) => setTimeout(resolve, 300 * (3 - retries)));
+    return fetchJson<T>(url, retries - 1);
+  }
+  if (!response.ok) throw new Error(`HN request failed: ${response.status}`);
+  return response.json() as Promise<T>;
+}
+
+async function fetchItem(id: number): Promise<HnItem | null> {
+  const cacheKey = `${ITEM_CACHE_PREFIX}${id}`;
+  const cached = sessionStorage.getItem(cacheKey);
+  if (cached) return JSON.parse(cached) as HnItem;
+
+  const item = await fetchJson<HnItem | null>(`${BASE_URL}/item/${id}.json`);
+  if (item) sessionStorage.setItem(cacheKey, JSON.stringify(item));
+  return item;
+}
+
+export async function fetchStoryIds(settings: Settings): Promise<number[]> {
+  const enabledSources = (Object.keys(settings.sources) as StorySource[]).filter((source) => settings.sources[source]);
+  const groups = await Promise.all(
+    enabledSources.map((source) => fetchJson<number[]>(`${BASE_URL}/${ENDPOINTS[source]}.json`)),
+  );
+  return mergeStoryIds(groups);
+}
+
+export async function fetchStoryItems(ids: number[], maxItems: number): Promise<HnItem[]> {
+  const selected = ids.slice(0, Math.max(maxItems * 2, maxItems));
+  const chunks: number[][] = [];
+  for (let index = 0; index < selected.length; index += 50) {
+    chunks.push(selected.slice(index, index + 50));
+  }
+
+  const items: HnItem[] = [];
+  for (const chunk of chunks) {
+    const results = await Promise.allSettled(chunk.map(fetchItem));
+    for (const result of results) {
+      if (result.status === 'fulfilled' && result.value) items.push(result.value);
+    }
+  }
+  return items;
+}
