@@ -81,11 +81,47 @@ h1 {
 .feed,
 .recent-list {
   margin: 0;
-  padding: 10px 8px 12px 34px;
+  padding: 10px 8px 12px;
+}
+
+.feed {
+  counter-reset: river-item;
 }
 
 .post {
+  counter-increment: river-item;
+  display: grid;
+  grid-template-columns: 24px 28px minmax(0, 1fr);
+  column-gap: 4px;
   padding: 4px 0 7px;
+}
+
+.post::before {
+  content: counter(river-item) ".";
+  grid-column: 2;
+  color: #828282;
+  text-align: right;
+}
+
+.post-body {
+  grid-column: 3;
+  min-width: 0;
+}
+
+.dismiss-button {
+  grid-column: 1;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  background: transparent;
+  color: #828282;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.dismiss-button:hover,
+.dismiss-button:focus-visible {
+  color: #000;
 }
 
 .title-link {
@@ -178,7 +214,7 @@ h1 {
   }
 
   .feed {
-    padding-left: 30px;
+    padding-left: 6px;
   }
 
   .post {

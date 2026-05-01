@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DEFAULT_SETTINGS, LEDGER_KEY } from './lib/constants';
 import { buildFeed, findNewIds } from './lib/feed';
 import { fetchStoryIds, fetchStoryItems } from './lib/hnApi';
-import { cleanupLedger, markItemsSeen, markTapped, readLedger, recentlyRead, writeLedger } from './lib/ledger';
+import { cleanupLedger, markDismissed, markItemsSeen, markTapped, readLedger, recentlyRead, writeLedger } from './lib/ledger';
 import { readSettings, writeSettings } from './lib/storage';
 import { domainFromUrl, timeAgo } from './lib/time';
 import type { HnItem, SeenLedger, Settings, StorySource } from './types';
@@ -111,6 +111,10 @@ export default function App() {
     window.open(item.url ?? commentsUrl(item.id), '_blank', 'noopener,noreferrer');
   }
 
+  function dismissStory(item: HnItem) {
+    persistLedger(markDismissed(ledger, item.id));
+  }
+
   function updateSettings(next: Settings) {
     setSettings(next);
     writeSettings(localStorage, next);
@@ -144,14 +148,19 @@ export default function App() {
       <ol className="feed">
         {feed.map((item) => (
           <li className="post" key={item.id}>
-            <a className="title-link" href={item.url ?? commentsUrl(item.id)} onClick={(event) => openStory(item, event)}>
-              <span>{item.title}</span> <span className="domain">({domainFromUrl(item.url)})</span>
-            </a>
-            <div className="meta">
-              {item.score ?? 0} pts · {item.by ?? 'unknown'} · {timeAgo(item.time, now)} ·{' '}
-              <a href={commentsUrl(item.id)} target="_blank" rel="noreferrer">
-                {item.descendants ?? 0} cmnts
+            <button className="dismiss-button" onClick={() => dismissStory(item)} aria-label={`Dismiss ${item.title}`} title="Dismiss">
+              ✓
+            </button>
+            <div className="post-body">
+              <a className="title-link" href={item.url ?? commentsUrl(item.id)} onClick={(event) => openStory(item, event)}>
+                <span>{item.title}</span> <span className="domain">({domainFromUrl(item.url)})</span>
               </a>
+              <div className="meta">
+                {item.score ?? 0} pts · {item.by ?? 'unknown'} · {timeAgo(item.time, now)} ·{' '}
+                <a href={commentsUrl(item.id)} target="_blank" rel="noreferrer">
+                  {item.descendants ?? 0} cmnts
+                </a>
+              </div>
             </div>
           </li>
         ))}

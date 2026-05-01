@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cleanupLedger, markItemsSeen, markTapped, recentlyRead } from './ledger';
+import { cleanupLedger, markDismissed, markItemsSeen, markTapped, recentlyRead } from './ledger';
 import type { HnItem, SeenLedger } from '../types';
 
 const now = new Date('2026-04-30T14:00:00Z');
@@ -25,6 +25,18 @@ describe('seen ledger', () => {
       tapped: true,
       tappedAt: '2026-04-30T14:00:00.000Z',
     });
+  });
+
+  it('marks dismissed items without adding them to recently read', () => {
+    const ledger = markDismissed({}, 42, now);
+
+    expect(ledger['42']).toEqual({
+      firstSeen: '2026-04-30T14:00:00.000Z',
+      tapped: false,
+      dismissed: true,
+      dismissedAt: '2026-04-30T14:00:00.000Z',
+    });
+    expect(recentlyRead([item(42)], ledger, now)).toEqual([]);
   });
 
   it('purges untapped and tapped entries after their distinct TTLs', () => {

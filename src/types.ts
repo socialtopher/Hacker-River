@@ -17,6 +17,8 @@ export type LedgerEntry = {
   firstSeen: string;
   tapped: boolean;
   tappedAt?: string;
+  dismissed?: boolean;
+  dismissedAt?: string;
 };
 
 export type SeenLedger = Record<string, LedgerEntry>;

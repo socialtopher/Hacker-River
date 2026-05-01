@@ -4,6 +4,7 @@ import type { HnItem, LedgerEntry, SeenLedger } from '../types';
 
 export function isUntappedVisible(entry: LedgerEntry | undefined, now: Date, unseenTtlMs = HOUR_MS): boolean {
   if (!entry) return true;
+  if (entry.dismissed) return false;
   return !entry.tapped && ageMs(entry.firstSeen, now) < unseenTtlMs;
 }
 
@@ -20,6 +21,7 @@ export function cleanupLedger(
 ): SeenLedger {
   return Object.fromEntries(
     Object.entries(ledger).filter(([, entry]) => {
+      if (entry.dismissed) return true;
       if (entry.tapped) return isTappedVisible(entry, now, tappedTtlMs);
       return ageMs(entry.firstSeen, now) < unseenTtlMs;
     }),
@@ -43,6 +45,19 @@ export function markTapped(ledger: SeenLedger, id: number, now = new Date()): Se
       firstSeen: ledger[key]?.firstSeen ?? now.toISOString(),
       tapped: true,
       tappedAt: now.toISOString(),
+    },
+  };
+}
+
+export function markDismissed(ledger: SeenLedger, id: number, now = new Date()): SeenLedger {
+  const key = String(id);
+  return {
+    ...ledger,
+    [key]: {
+      firstSeen: ledger[key]?.firstSeen ?? now.toISOString(),
+      tapped: false,
+      dismissed: true,
+      dismissedAt: now.toISOString(),
     },
   };
 }

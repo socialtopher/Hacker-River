@@ -40,6 +40,15 @@ describe('feed construction', () => {
     expect(buildFeed([story(1, 3, 1), story(2, 4, 2), story(3, 5, 3)], ledger, now, 10).map((item) => item.id)).toEqual([1]);
   });
 
+  it('hides dismissed stories even when their seen TTL has not expired', () => {
+    const now = new Date('2026-04-30T14:00:00Z');
+    const ledger: SeenLedger = {
+      '1': { firstSeen: '2026-04-30T13:59:00Z', tapped: false, dismissed: true, dismissedAt: '2026-04-30T13:59:30Z' },
+    };
+
+    expect(buildFeed([story(1, 100, 1)], ledger, now, 10)).toEqual([]);
+  });
+
   it('diffs fetched ids against the ledger for background refresh banners', () => {
     const ledger: SeenLedger = {
       '1': { firstSeen: '2026-04-30T13:00:00Z', tapped: false },
