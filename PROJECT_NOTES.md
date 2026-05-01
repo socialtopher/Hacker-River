@@ -17,4 +17,4 @@ These are repo-specific preferences and product decisions taught during developm
 - Sharing copies the story URL when available, falling back to the Hacker News comments URL.
 - The feed uses Hacker News-style paging: show 30 items at a time with a `More` control.
 - Moving to the next page clears all currently visible page items by marking them dismissed.
-- The title count is an inbox count: capped feed items remaining after clicked or dismissed items are removed, without backfilling from extra fetched stories.
+- The title count is an inbox count: all fetched API items remaining after clicked or dismissed items are removed.

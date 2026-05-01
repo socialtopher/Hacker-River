@@ -189,6 +189,14 @@ describe('Hacker River app', () => {
     expect(screen.getByRole('button', { name: /More/ })).toBeInTheDocument();
   });
 
+  it('counts every fetched API item instead of capping the inbox at 300', async () => {
+    mockFeed(350);
+
+    render(<App />);
+
+    expect(await screen.findByRole('heading', { name: 'Hacker River (350)' })).toBeInTheDocument();
+  });
+
   it('shows the unclicked and unhidden inbox count in the title', async () => {
     mockFeed(31);
 

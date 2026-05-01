@@ -28,5 +28,4 @@ export type Settings = {
   unseenTtlMs: number;
   tappedTtlMs: number;
   sources: Record<StorySource, boolean>;
-  maxItems: number;
 };

@@ -57,8 +57,8 @@ export default function App() {
       setMessage('');
       try {
         const ids = await fetchStoryIds(settings);
-        const fetched = await fetchStoryItems(ids, settings.maxItems);
-        const feed = buildFeed(fetched, cleaned, now, settings.maxItems, settings.unseenTtlMs);
+        const fetched = await fetchStoryItems(ids);
+        const feed = buildFeed(fetched, cleaned, now, undefined, settings.unseenTtlMs);
         const nextLedger = markItemsSeen(cleaned, feed, now);
         persistLedger(nextLedger);
         setItems(fetched);
@@ -102,8 +102,8 @@ export default function App() {
 
   const now = useMemo(() => new Date(), [ledger, items]);
   const feed = useMemo(
-    () => buildFeed(items, ledger, now, settings.maxItems, settings.unseenTtlMs),
-    [items, ledger, now, settings.maxItems, settings.unseenTtlMs],
+    () => buildFeed(items, ledger, now, undefined, settings.unseenTtlMs),
+    [items, ledger, now, settings.unseenTtlMs],
   );
   const readItems = useMemo(() => recentlyRead(items, ledger, now, settings.tappedTtlMs), [items, ledger, now, settings.tappedTtlMs]);
   const inboxCount = feed.length;
@@ -241,17 +241,6 @@ function SettingsPanel({ settings, onChange }: { settings: Settings; onChange: (
           <option value={15}>15 min</option>
           <option value={30}>30 min</option>
           <option value="off">Off</option>
-        </select>
-      </label>
-
-      <label>
-        Max items
-        <select value={settings.maxItems} onChange={(event) => onChange({ ...settings, maxItems: Number(event.target.value) })}>
-          {[100, 200, 300, 500].map((value) => (
-            <option key={value} value={value}>
-              {value}
-            </option>
-          ))}
         </select>
       </label>
 

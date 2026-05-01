@@ -40,8 +40,8 @@ export async function fetchStoryIds(settings: Settings): Promise<number[]> {
   return mergeStoryIds(groups);
 }
 
-export async function fetchStoryItems(ids: number[], maxItems: number): Promise<HnItem[]> {
-  const selected = ids.slice(0, Math.max(maxItems * 2, maxItems));
+export async function fetchStoryItems(ids: number[]): Promise<HnItem[]> {
+  const selected = ids;
   const chunks: number[][] = [];
   for (let index = 0; index < selected.length; index += 50) {
     chunks.push(selected.slice(index, index + 50));

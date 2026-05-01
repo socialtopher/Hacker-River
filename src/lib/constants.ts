@@ -18,5 +18,4 @@ export const DEFAULT_SETTINGS: Settings = {
     show: true,
     job: true,
   },
-  maxItems: 300,
 };

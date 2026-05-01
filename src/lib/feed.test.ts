@@ -61,6 +61,14 @@ describe('feed construction', () => {
     ]);
   });
 
+  it('returns every visible item when no limit is provided', () => {
+    expect(buildFeed([story(1, 100, 1), story(2, 90, 2), story(3, 80, 3)], {}, new Date('2026-04-30T14:00:00Z')).map((item) => item.id)).toEqual([
+      1,
+      2,
+      3,
+    ]);
+  });
+
   it('diffs fetched ids against the ledger for background refresh banners', () => {
     const ledger: SeenLedger = {
       '1': { firstSeen: '2026-04-30T13:00:00Z', tapped: false },

@@ -22,13 +22,15 @@ export function buildFeed(
   items: HnItem[],
   ledger: SeenLedger,
   now = new Date(),
-  maxItems = 300,
+  maxItems?: number,
   unseenTtlMs = HOUR_MS,
 ): HnItem[] {
-  return items
+  const sorted = items
     .filter((item) => item && !item.dead && !item.deleted && item.type === 'story' && item.title)
-    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || b.time - a.time)
-    .slice(0, maxItems)
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || b.time - a.time);
+  const capped = maxItems === undefined ? sorted : sorted.slice(0, maxItems);
+
+  return capped
     .filter((item) => isUntappedVisible(ledger[String(item.id)], now, unseenTtlMs));
 }
 
