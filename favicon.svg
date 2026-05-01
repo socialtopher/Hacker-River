@@ -1,0 +1,60 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" width="500" height="500">
+  <defs>
+    <clipPath id="rounded-clip">
+      <rect width="500" height="500" rx="58" ry="58"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#rounded-clip)">
+
+    <!-- Navy blue base (entire background) -->
+    <rect width="500" height="500" fill="#1B3B70"/>
+
+    <!-- Orange-red top section -->
+    <rect width="500" height="308" fill="#E34B22"/>
+
+    <!-- ═══════════ WHITE BOLD "H" ═══════════ -->
+    <!-- Left vertical bar -->
+    <rect x="108" y="56" width="78" height="214" fill="white"/>
+    <!-- Right vertical bar -->
+    <rect x="314" y="56" width="78" height="214" fill="white"/>
+    <!-- Horizontal crossbar -->
+    <rect x="108" y="148" width="284" height="66" fill="white"/>
+
+    <!-- ═══════════ WAVE LAYERS ═══════════ -->
+
+    <!-- Wave 1: White wave — the top boundary -->
+    <path d="
+      M 0,272
+      C 70,248 160,298 250,272
+      C 340,246 430,296 500,272
+      L 500,308
+      C 430,332 340,282 250,308
+      C 160,334 70,284 0,308
+      Z
+    " fill="white"/>
+
+    <!-- Wave 2: Light sky-blue wave -->
+    <path d="
+      M 0,305
+      C 70,281 160,331 250,305
+      C 340,279 430,329 500,305
+      L 500,350
+      C 430,374 340,324 250,350
+      C 160,376 70,326 0,350
+      Z
+    " fill="#62B8DC"/>
+
+    <!-- Wave 3: Lighter blue wave -->
+    <path d="
+      M 0,342
+      C 70,318 160,368 250,342
+      C 340,316 430,366 500,342
+      L 500,392
+      C 430,416 340,366 250,392
+      C 160,418 70,368 0,392
+      Z
+    " fill="#84CBE8"/>
+
+  </g>
+</svg>
