@@ -140,6 +140,7 @@ describe('Hacker River app', () => {
     await userEvent.click(screen.getByRole('button', { name: /Share Share me/ }));
 
     expect(writeText).toHaveBeenCalledWith('https://example.com/1');
+    expect(screen.queryByText('Link copied.')).not.toBeInTheDocument();
   });
 
   it('shows Copied for 3 seconds after sharing', async () => {
@@ -186,6 +187,16 @@ describe('Hacker River app', () => {
     expect(screen.getByRole('link', { name: 'Story 30 (example.com)' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Story 31 (example.com)' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /More/ })).toBeInTheDocument();
+  });
+
+  it('shows the remaining feed count in the title', async () => {
+    mockFeed(31);
+
+    render(<App />);
+
+    expect(await screen.findByRole('heading', { name: 'Hacker River (31)' })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /More/ }));
+    expect(screen.getByRole('heading', { name: 'Hacker River (1)' })).toBeInTheDocument();
   });
 
   it('clears the current page when moving to the next page', async () => {

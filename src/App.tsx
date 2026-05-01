@@ -129,7 +129,6 @@ export default function App() {
     try {
       await navigator.clipboard.writeText(item.url ?? commentsUrl(item.id));
       setCopiedId(item.id);
-      setMessage('Link copied.');
       window.setTimeout(() => setCopiedId((current) => (current === item.id ? null : current)), 3000);
     } catch {
       setMessage('Could not copy link.');
@@ -144,7 +143,7 @@ export default function App() {
   return (
     <main className="shell">
       <header className="topbar">
-        <h1>Hacker River</h1>
+        <h1>Hacker River ({feed.length})</h1>
         <div className="toolbar">
           <button className="icon-button" onClick={() => void loadFeed('manual')} aria-label="Refresh" title="Refresh">
             {status === 'refreshing' || status === 'loading' ? '...' : '↻'}
