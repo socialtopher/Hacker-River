@@ -106,6 +106,7 @@ export default function App() {
     [items, ledger, now, settings.maxItems, settings.unseenTtlMs],
   );
   const readItems = useMemo(() => recentlyRead(items, ledger, now, settings.tappedTtlMs), [items, ledger, now, settings.tappedTtlMs]);
+  const inboxCount = feed.length;
   const visibleFeed = feed.slice(0, PAGE_SIZE);
 
   function openStory(item: HnItem, event?: React.MouseEvent<HTMLAnchorElement>) {
@@ -143,7 +144,7 @@ export default function App() {
   return (
     <main className="shell">
       <header className="topbar">
-        <h1>Hacker River ({feed.length})</h1>
+        <h1>Hacker River ({inboxCount})</h1>
         <div className="toolbar">
           <button className="icon-button" onClick={() => void loadFeed('manual')} aria-label="Refresh" title="Refresh">
             {status === 'refreshing' || status === 'loading' ? '...' : '↻'}

@@ -189,14 +189,18 @@ describe('Hacker River app', () => {
     expect(screen.getByRole('button', { name: /More/ })).toBeInTheDocument();
   });
 
-  it('shows the remaining feed count in the title', async () => {
+  it('shows the unclicked and unhidden inbox count in the title', async () => {
     mockFeed(31);
 
     render(<App />);
 
     expect(await screen.findByRole('heading', { name: 'Hacker River (31)' })).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: /More/ }));
-    expect(screen.getByRole('heading', { name: 'Hacker River (1)' })).toBeInTheDocument();
+    vi.spyOn(window, 'open').mockImplementation(() => null);
+    await userEvent.click(screen.getByRole('link', { name: 'Story 1 (example.com)' }));
+    expect(screen.getByRole('heading', { name: 'Hacker River (30)' })).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Dismiss Story 2' }));
+    expect(screen.getByRole('heading', { name: 'Hacker River (29)' })).toBeInTheDocument();
   });
 
   it('clears the current page when moving to the next page', async () => {
