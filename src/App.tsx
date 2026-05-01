@@ -34,6 +34,7 @@ export default function App() {
   const [pendingNew, setPendingNew] = useState(0);
   const [readOpen, setReadOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
 
   const persistLedger = useCallback((next: SeenLedger) => {
     setLedger(next);
@@ -127,7 +128,9 @@ export default function App() {
   async function shareStory(item: HnItem) {
     try {
       await navigator.clipboard.writeText(item.url ?? commentsUrl(item.id));
+      setCopiedId(item.id);
       setMessage('Link copied.');
+      window.setTimeout(() => setCopiedId((current) => (current === item.id ? null : current)), 3000);
     } catch {
       setMessage('Could not copy link.');
     }
@@ -180,7 +183,7 @@ export default function App() {
                 </a>{' '}
                 ·{' '}
                 <button className="meta-button" onClick={() => void shareStory(item)} aria-label={`Share ${item.title}`}>
-                  Share
+                  {copiedId === item.id ? 'Copied!' : 'Share'}
                 </button>
               </div>
             </div>

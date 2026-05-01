@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import type { HnItem } from './types';
 
@@ -40,6 +40,11 @@ describe('Hacker River app', () => {
     localStorage.clear();
     sessionStorage.clear();
     vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('renders fetched stories and records first render in the ledger', async () => {
@@ -135,6 +140,41 @@ describe('Hacker River app', () => {
     await userEvent.click(screen.getByRole('button', { name: /Share Share me/ }));
 
     expect(writeText).toHaveBeenCalledWith('https://example.com/1');
+  });
+
+  it('shows Copied for 3 seconds after sharing', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) => {
+        if (url.includes('topstories')) return response([1]);
+        if (url.includes('newstories')) return response([]);
+        if (url.includes('askstories')) return response([]);
+        if (url.includes('showstories')) return response([]);
+        if (url.includes('jobstories')) return response([]);
+        if (url.includes('/item/1.json')) return response(item(1, 'Copy state', 88));
+        return Promise.reject(new Error(`Unexpected URL ${url}`));
+      }),
+    );
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: vi.fn().mockResolvedValue(undefined) },
+      configurable: true,
+    });
+
+    render(<App />);
+    await screen.findByRole('link', { name: /Copy state/ });
+    vi.useFakeTimers();
+    fireEvent.click(screen.getByRole('button', { name: /Share Copy state/ }));
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(screen.getByRole('button', { name: /Share Copy state/ })).toHaveTextContent('Copied!');
+
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+
+    expect(screen.getByRole('button', { name: /Share Copy state/ })).toHaveTextContent('Share');
   });
 
   it('shows only 30 feed items at a time', async () => {
