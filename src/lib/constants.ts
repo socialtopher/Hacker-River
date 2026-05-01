@@ -9,6 +9,7 @@ export const DAY_MS = 24 * HOUR_MS;
 
 export const DEFAULT_SETTINGS: Settings = {
   autoRefreshMinutes: 5,
+  sortBy: 'hnRank',
   unseenTtlMs: HOUR_MS,
   tappedTtlMs: 5 * DAY_MS,
   sources: {

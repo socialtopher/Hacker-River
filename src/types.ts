@@ -1,4 +1,5 @@
 export type StorySource = 'top' | 'new' | 'ask' | 'show' | 'job';
+export type SortBy = 'hnRank' | 'newest' | 'ask' | 'show' | 'job';
 
 export type HnItem = {
   id: number;
@@ -11,6 +12,8 @@ export type HnItem = {
   url?: string;
   dead?: boolean;
   deleted?: boolean;
+  hnRank?: number;
+  sourceRanks?: Partial<Record<StorySource, number>>;
 };
 
 export type LedgerEntry = {
@@ -25,6 +28,7 @@ export type SeenLedger = Record<string, LedgerEntry>;
 
 export type Settings = {
   autoRefreshMinutes: number | 'off';
+  sortBy: SortBy;
   unseenTtlMs: number;
   tappedTtlMs: number;
   sources: Record<StorySource, boolean>;

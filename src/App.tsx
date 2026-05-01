@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DEFAULT_SETTINGS, LEDGER_KEY } from './lib/constants';
 import { buildFeed, findNewIds } from './lib/feed';
-import { fetchStoryIds, fetchStoryItems } from './lib/hnApi';
+import { fetchStoryIds, fetchStoryItems, fetchStoryPlan } from './lib/hnApi';
 import { cleanupLedger, markDismissed, markItemsSeen, markTapped, readLedger, recentlyRead, writeLedger } from './lib/ledger';
 import { readSettings, writeSettings } from './lib/storage';
 import { domainFromUrl, timeAgo } from './lib/time';
-import type { HnItem, SeenLedger, Settings, StorySource } from './types';
+import type { HnItem, SeenLedger, Settings, SortBy, StorySource } from './types';
 import './styles.css';
 
 type Status = 'idle' | 'loading' | 'refreshing' | 'error';
@@ -14,6 +14,14 @@ const PAGE_SIZE = 30;
 const SOURCE_LABELS: Record<StorySource, string> = {
   top: 'Top',
   new: 'New',
+  ask: 'Ask',
+  show: 'Show',
+  job: 'Jobs',
+};
+
+const SORT_LABELS: Record<SortBy, string> = {
+  hnRank: 'HN Rank',
+  newest: 'Newest',
   ask: 'Ask',
   show: 'Show',
   job: 'Jobs',
@@ -56,9 +64,9 @@ export default function App() {
       setStatus(mode === 'initial' ? 'loading' : 'refreshing');
       setMessage('');
       try {
-        const ids = await fetchStoryIds(settings);
-        const fetched = await fetchStoryItems(ids);
-        const feed = buildFeed(fetched, cleaned, now, undefined, settings.unseenTtlMs);
+        const { ids, metadataById } = await fetchStoryPlan(settings);
+        const fetched = await fetchStoryItems(ids, metadataById);
+        const feed = buildFeed(fetched, cleaned, now, { unseenTtlMs: settings.unseenTtlMs, sortBy: settings.sortBy });
         const nextLedger = markItemsSeen(cleaned, feed, now);
         persistLedger(nextLedger);
         setItems(fetched);
@@ -102,8 +110,8 @@ export default function App() {
 
   const now = useMemo(() => new Date(), [ledger, items]);
   const feed = useMemo(
-    () => buildFeed(items, ledger, now, undefined, settings.unseenTtlMs),
-    [items, ledger, now, settings.unseenTtlMs],
+    () => buildFeed(items, ledger, now, { unseenTtlMs: settings.unseenTtlMs, sortBy: settings.sortBy }),
+    [items, ledger, now, settings.sortBy, settings.unseenTtlMs],
   );
   const readItems = useMemo(() => recentlyRead(items, ledger, now, settings.tappedTtlMs), [items, ledger, now, settings.tappedTtlMs]);
   const inboxCount = feed.length;
@@ -241,6 +249,25 @@ function SettingsPanel({ settings, onChange }: { settings: Settings; onChange: (
           <option value={15}>15 min</option>
           <option value={30}>30 min</option>
           <option value="off">Off</option>
+        </select>
+      </label>
+
+      <label>
+        Sort by
+        <select
+          value={settings.sortBy}
+          onChange={(event) =>
+            onChange({
+              ...settings,
+              sortBy: event.target.value as SortBy,
+            })
+          }
+        >
+          {(Object.keys(SORT_LABELS) as SortBy[]).map((sortBy) => (
+            <option key={sortBy} value={sortBy}>
+              {SORT_LABELS[sortBy]}
+            </option>
+          ))}
         </select>
       </label>
 

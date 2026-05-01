@@ -36,3 +36,28 @@ Verification performed:
 
 Remaining risks or follow-ups:
 - Visual parity is closer, but exact browser-level font rendering will still depend on the user’s installed Verdana fallback behavior.
+
+## 2026-04-30 - Task 3
+
+Summary of changes:
+- Made HN Rank the default feed order instead of score sorting.
+- Added a `Sort by` setting with immediate reordering for `HN Rank`, `Newest`, `Ask`, `Show`, and `Jobs`.
+- Carried HN/source rank metadata through fetch and feed construction so sort changes do not require a refetch.
+
+Files changed:
+- `src/App.tsx`
+- `src/App.test.tsx`
+- `src/lib/constants.ts`
+- `src/lib/feed.ts`
+- `src/lib/feed.test.ts`
+- `src/lib/hnApi.ts`
+- `src/types.ts`
+- `TASKS.md`
+
+Verification performed:
+- `npm test -- --run src/lib/feed.test.ts src/App.test.tsx`
+- `npm test`
+- `npm run build`
+
+Remaining risks or follow-ups:
+- Source-priority sorts use each story’s membership/rank inside the fetched HN source lists; if HN changes endpoint composition, the relative grouping will follow that API data.

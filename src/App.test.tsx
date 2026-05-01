@@ -225,4 +225,34 @@ describe('Hacker River app', () => {
     const ledger = JSON.parse(localStorage.getItem('hackerriver_ledger') ?? '{}');
     expect(Array.from({ length: 30 }, (_, index) => ledger[String(index + 1)]?.dismissed)).toEqual(Array(30).fill(true));
   });
+
+  it('defaults to HN rank and reorders immediately when Sort by changes', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) => {
+        if (url.includes('topstories')) return response([2, 1]);
+        if (url.includes('newstories')) return response([]);
+        if (url.includes('askstories')) return response([3]);
+        if (url.includes('showstories')) return response([]);
+        if (url.includes('jobstories')) return response([]);
+        if (url.includes('/item/1.json')) return response({ ...item(1, 'Top second', 10), time: 100 });
+        if (url.includes('/item/2.json')) return response({ ...item(2, 'Top first', 99), time: 50 });
+        if (url.includes('/item/3.json')) return response({ ...item(3, 'Ask first', 1), time: 200 });
+        return Promise.reject(new Error(`Unexpected URL ${url}`));
+      }),
+    );
+
+    const { container } = render(<App />);
+    await screen.findByRole('link', { name: /Top first/ });
+
+    const titles = () => Array.from(container.querySelectorAll('.title-link')).map((node) => node.textContent?.trim());
+    expect(titles()).toEqual(['Top first (example.com)', 'Top second (example.com)', 'Ask first (example.com)']);
+
+    await userEvent.click(screen.getByRole('button', { name: /Settings/ }));
+    await userEvent.selectOptions(screen.getByLabelText('Sort by'), 'ask');
+    expect(titles()).toEqual(['Ask first (example.com)', 'Top first (example.com)', 'Top second (example.com)']);
+
+    await userEvent.selectOptions(screen.getByLabelText('Sort by'), 'newest');
+    expect(titles()).toEqual(['Ask first (example.com)', 'Top second (example.com)', 'Top first (example.com)']);
+  });
 });

@@ -3,6 +3,7 @@ import { mergeStoryIds } from './feed';
 import type { HnItem, Settings, StorySource } from '../types';
 
 const BASE_URL = 'https://hacker-news.firebaseio.com/v0';
+type StoryMetadataById = Record<number, Pick<HnItem, 'hnRank' | 'sourceRanks'>>;
 
 const ENDPOINTS: Record<StorySource, string> = {
   top: 'topstories',
@@ -32,15 +33,35 @@ async function fetchItem(id: number): Promise<HnItem | null> {
   return item;
 }
 
-export async function fetchStoryIds(settings: Settings): Promise<number[]> {
+export async function fetchStoryPlan(settings: Settings): Promise<{ ids: number[]; metadataById: StoryMetadataById }> {
   const enabledSources = (Object.keys(settings.sources) as StorySource[]).filter((source) => settings.sources[source]);
-  const groups = await Promise.all(
-    enabledSources.map((source) => fetchJson<number[]>(`${BASE_URL}/${ENDPOINTS[source]}.json`)),
+  const sourceEntries = await Promise.all(
+    enabledSources.map(async (source) => [source, await fetchJson<number[]>(`${BASE_URL}/${ENDPOINTS[source]}.json`)] as const),
   );
-  return mergeStoryIds(groups);
+  const groups = sourceEntries.map(([, ids]) => ids);
+  const ids = mergeStoryIds(groups);
+  const metadataById: StoryMetadataById = {};
+
+  ids.forEach((id, hnRank) => {
+    metadataById[id] = { hnRank, sourceRanks: {} };
+  });
+
+  sourceEntries.forEach(([source, sourceIds]) => {
+    sourceIds.forEach((id, sourceRank) => {
+      if (!metadataById[id]) metadataById[id] = { hnRank: Number.MAX_SAFE_INTEGER, sourceRanks: {} };
+      metadataById[id].sourceRanks = { ...metadataById[id].sourceRanks, [source]: sourceRank };
+    });
+  });
+
+  return { ids, metadataById };
 }
 
-export async function fetchStoryItems(ids: number[]): Promise<HnItem[]> {
+export async function fetchStoryIds(settings: Settings): Promise<number[]> {
+  const { ids } = await fetchStoryPlan(settings);
+  return ids;
+}
+
+export async function fetchStoryItems(ids: number[], metadataById: StoryMetadataById = {}): Promise<HnItem[]> {
   const selected = ids;
   const chunks: number[][] = [];
   for (let index = 0; index < selected.length; index += 50) {
@@ -59,7 +80,7 @@ export async function fetchStoryItems(ids: number[]): Promise<HnItem[]> {
       }),
     );
     for (const item of results) {
-      if (item) items.push(item);
+      if (item) items.push({ ...item, ...metadataById[item.id] });
     }
   }
   return items;
