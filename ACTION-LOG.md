@@ -61,3 +61,20 @@ Verification performed:
 
 Remaining risks or follow-ups:
 - Source-priority sorts use each story’s membership/rank inside the fetched HN source lists; if HN changes endpoint composition, the relative grouping will follow that API data.
+
+## 2026-04-30 - Task 4
+
+Summary of changes:
+- Added a focused roadmap in `IDEAS.md` covering speed, animation, and usefulness improvements.
+- Included a suggested implementation order and lightweight research notes with current references.
+
+Files changed:
+- `IDEAS.md`
+- `TASKS.md`
+
+Verification performed:
+- `npm test`
+- `npm run build`
+
+Remaining risks or follow-ups:
+- Roadmap items are proposals only; the service-worker and background-task ideas need implementation-time browser support checks before shipping.

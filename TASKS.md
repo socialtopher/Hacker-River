@@ -12,7 +12,7 @@ Do not make broad rewrites unless explicitly instructed. Prefer small, safe, inc
 
 ## Open Tasks
 
-1. Research a roadmap of additional features that would make Hacker River faster, more animated, or more usefu, and propose each idea in IDEAS.md for my review later. 
+None.
 
 ## Closed Tasks
 
@@ -29,3 +29,4 @@ Preserve source order: top, then new, ask, show, jobs; closest if treating each 
 Current score sort: good “river by popularity,” but not closest to HN because HN ranking is not just score.
 Add a setting: HN order vs Score vs Newest.
 I’d pick HN order as the default next.", make HN Rank the default, and create a drop-down in settings called "Sort by" with these choices: HN Rank, Newest, Ask, Show, and Jobs. Change the sort immediately when a new sort order is selected. 
+4. Research a roadmap of additional features that would make Hacker River faster, more animated, or more usefu, and propose each idea in IDEAS.md for my review later. 
