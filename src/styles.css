@@ -148,8 +148,8 @@ h1 {
 .meta a,
 .recent-list span {
   color: #828282;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 11px;
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 10px;
 }
 
 .meta a {

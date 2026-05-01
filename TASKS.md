@@ -12,9 +12,7 @@ Do not make broad rewrites unless explicitly instructed. Prefer small, safe, inc
 
 ## Open Tasks
 
-1. Inspect the font actually used on hacker news and update the hacker river font to match (as long as there's not a copyright issue; if so, choose a similar alternative)
-
-2. Using this context: "Current sorting:
+1. Using this context: "Current sorting:
 
 Score descending
 Tie-breaker: newer story time first
@@ -26,8 +24,9 @@ Current score sort: good “river by popularity,” but not closest to HN becaus
 Add a setting: HN order vs Score vs Newest.
 I’d pick HN order as the default next.", make HN Rank the default, and create a drop-down in settings called "Sort by" with these choices: HN Rank, Newest, Ask, Show, and Jobs. Change the sort immediately when a new sort order is selected. 
 
-3. Research a roadmap of additional features that would make Hacker River faster, more animated, or more usefu, and propose each idea in IDEAS.md for my review later. 
+2. Research a roadmap of additional features that would make Hacker River faster, more animated, or more usefu, and propose each idea in IDEAS.md for my review later. 
 
 ## Closed Tasks
 
 1. I've dropped favicon.svg into the repo folder. Set it up as the favicon of the site.
+2. Inspect the font actually used on hacker news and update the hacker river font to match (as long as there's not a copyright issue; if so, choose a similar alternative)
