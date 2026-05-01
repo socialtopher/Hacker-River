@@ -32,7 +32,7 @@ export function markItemsSeen(ledger: SeenLedger, items: HnItem[], now = new Dat
   const next = { ...ledger };
   for (const item of items) {
     const key = String(item.id);
-    next[key] ??= { firstSeen: now.toISOString(), tapped: false };
+    if (!next[key]) next[key] = { firstSeen: now.toISOString(), tapped: false };
   }
   return next;
 }

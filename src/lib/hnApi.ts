@@ -49,9 +49,17 @@ export async function fetchStoryItems(ids: number[], maxItems: number): Promise<
 
   const items: HnItem[] = [];
   for (const chunk of chunks) {
-    const results = await Promise.allSettled(chunk.map(fetchItem));
-    for (const result of results) {
-      if (result.status === 'fulfilled' && result.value) items.push(result.value);
+    const results = await Promise.all(
+      chunk.map(async (id) => {
+        try {
+          return await fetchItem(id);
+        } catch {
+          return null;
+        }
+      }),
+    );
+    for (const item of results) {
+      if (item) items.push(item);
     }
   }
   return items;
