@@ -16,6 +16,25 @@ const item = (id: number, title: string, score: number): HnItem => ({
   url: `https://example.com/${id}`,
 });
 
+function mockFeed(count: number) {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn((url: string) => {
+      if (url.includes('topstories')) return response(Array.from({ length: count }, (_, index) => index + 1));
+      if (url.includes('newstories')) return response([]);
+      if (url.includes('askstories')) return response([]);
+      if (url.includes('showstories')) return response([]);
+      if (url.includes('jobstories')) return response([]);
+      const match = url.match(/\/item\/(\d+)\.json/);
+      if (match) {
+        const id = Number(match[1]);
+        return response(item(id, `Story ${id}`, 1000 - id));
+      }
+      return Promise.reject(new Error(`Unexpected URL ${url}`));
+    }),
+  );
+}
+
 describe('Hacker River app', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -116,5 +135,30 @@ describe('Hacker River app', () => {
     await userEvent.click(screen.getByRole('button', { name: /Share Share me/ }));
 
     expect(writeText).toHaveBeenCalledWith('https://example.com/1');
+  });
+
+  it('shows only 30 feed items at a time', async () => {
+    mockFeed(31);
+
+    render(<App />);
+
+    expect(await screen.findByRole('link', { name: 'Story 1 (example.com)' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Story 30 (example.com)' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Story 31 (example.com)' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /More/ })).toBeInTheDocument();
+  });
+
+  it('clears the current page when moving to the next page', async () => {
+    mockFeed(31);
+
+    render(<App />);
+    expect(await screen.findByRole('link', { name: 'Story 1 (example.com)' })).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /More/ }));
+
+    expect(screen.queryByRole('link', { name: 'Story 1 (example.com)' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Story 31 (example.com)' })).toBeInTheDocument();
+    const ledger = JSON.parse(localStorage.getItem('hackerriver_ledger') ?? '{}');
+    expect(Array.from({ length: 30 }, (_, index) => ledger[String(index + 1)]?.dismissed)).toEqual(Array(30).fill(true));
   });
 });

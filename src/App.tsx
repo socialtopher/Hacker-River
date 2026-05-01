@@ -9,6 +9,7 @@ import type { HnItem, SeenLedger, Settings, StorySource } from './types';
 import './styles.css';
 
 type Status = 'idle' | 'loading' | 'refreshing' | 'error';
+const PAGE_SIZE = 30;
 
 const SOURCE_LABELS: Record<StorySource, string> = {
   top: 'Top',
@@ -104,6 +105,7 @@ export default function App() {
     [items, ledger, now, settings.maxItems, settings.unseenTtlMs],
   );
   const readItems = useMemo(() => recentlyRead(items, ledger, now, settings.tappedTtlMs), [items, ledger, now, settings.tappedTtlMs]);
+  const visibleFeed = feed.slice(0, PAGE_SIZE);
 
   function openStory(item: HnItem, event?: React.MouseEvent<HTMLAnchorElement>) {
     event?.preventDefault();
@@ -113,6 +115,13 @@ export default function App() {
 
   function dismissStory(item: HnItem) {
     persistLedger(markDismissed(ledger, item.id));
+  }
+
+  function nextPage() {
+    const now = new Date();
+    const nextLedger = visibleFeed.reduce((current, item) => markDismissed(current, item.id, now), ledger);
+    persistLedger(nextLedger);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async function shareStory(item: HnItem) {
@@ -155,7 +164,7 @@ export default function App() {
       {status === 'loading' && <p className="empty">Fetching the river...</p>}
 
       <ol className="feed">
-        {feed.map((item) => (
+        {visibleFeed.map((item) => (
           <li className="post" key={item.id}>
             <button className="dismiss-button" onClick={() => dismissStory(item)} aria-label={`Dismiss ${item.title}`} title="Dismiss">
               ✓
@@ -178,6 +187,14 @@ export default function App() {
           </li>
         ))}
       </ol>
+
+      {feed.length > PAGE_SIZE && (
+        <div className="pager">
+          <button className="more-button" onClick={nextPage}>
+            More
+          </button>
+        </div>
+      )}
 
       {status !== 'loading' && feed.length === 0 && <p className="empty">Nothing fresh right now.</p>}
 

@@ -40,4 +40,9 @@ Object.defineProperty(globalThis, 'sessionStorage', {
   configurable: true,
 });
 
+Object.defineProperty(globalThis, 'scrollTo', {
+  value: () => undefined,
+  configurable: true,
+});
+
 afterEach(() => cleanup());

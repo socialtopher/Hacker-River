@@ -171,6 +171,24 @@ h1 {
   color: #000;
 }
 
+.pager {
+  padding: 0 8px 14px 64px;
+}
+
+.more-button {
+  min-height: 32px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #828282;
+  cursor: pointer;
+}
+
+.more-button:hover,
+.more-button:focus-visible {
+  color: #000;
+}
+
 .recent {
   border-top: 1px solid #e2e2d5;
   padding-bottom: 24px;

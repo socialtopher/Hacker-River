@@ -15,3 +15,5 @@ These are repo-specific preferences and product decisions taught during developm
 - Dismissal is separate from reading: dismissed items do not move into Recently Read.
 - A `Share` control belongs in the metadata line to the right of the comments link.
 - Sharing copies the story URL when available, falling back to the Hacker News comments URL.
+- The feed uses Hacker News-style paging: show 30 items at a time with a `More` control.
+- Moving to the next page clears all currently visible page items by marking them dismissed.
