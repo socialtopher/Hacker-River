@@ -150,6 +150,21 @@ h1 {
   text-decoration: none;
 }
 
+.meta-button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #828282;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.meta-button:hover,
+.meta-button:focus-visible {
+  color: #000;
+}
+
 .recent {
   border-top: 1px solid #e2e2d5;
   padding-bottom: 24px;

@@ -115,6 +115,15 @@ export default function App() {
     persistLedger(markDismissed(ledger, item.id));
   }
 
+  async function shareStory(item: HnItem) {
+    try {
+      await navigator.clipboard.writeText(item.url ?? commentsUrl(item.id));
+      setMessage('Link copied.');
+    } catch {
+      setMessage('Could not copy link.');
+    }
+  }
+
   function updateSettings(next: Settings) {
     setSettings(next);
     writeSettings(localStorage, next);
@@ -159,7 +168,11 @@ export default function App() {
                 {item.score ?? 0} pts · {item.by ?? 'unknown'} · {timeAgo(item.time, now)} ·{' '}
                 <a href={commentsUrl(item.id)} target="_blank" rel="noreferrer">
                   {item.descendants ?? 0} cmnts
-                </a>
+                </a>{' '}
+                ·{' '}
+                <button className="meta-button" onClick={() => void shareStory(item)} aria-label={`Share ${item.title}`}>
+                  Share
+                </button>
               </div>
             </div>
           </li>

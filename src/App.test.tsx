@@ -91,4 +91,30 @@ describe('Hacker River app', () => {
     const ledger = JSON.parse(localStorage.getItem('hackerriver_ledger') ?? '{}');
     expect(ledger['1'].dismissed).toBe(true);
   });
+
+  it('copies the story URL when its Share link is clicked', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) => {
+        if (url.includes('topstories')) return response([1]);
+        if (url.includes('newstories')) return response([]);
+        if (url.includes('askstories')) return response([]);
+        if (url.includes('showstories')) return response([]);
+        if (url.includes('jobstories')) return response([]);
+        if (url.includes('/item/1.json')) return response(item(1, 'Share me', 88));
+        return Promise.reject(new Error(`Unexpected URL ${url}`));
+      }),
+    );
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    });
+
+    render(<App />);
+    await screen.findByRole('link', { name: /Share me/ });
+    await userEvent.click(screen.getByRole('button', { name: /Share Share me/ }));
+
+    expect(writeText).toHaveBeenCalledWith('https://example.com/1');
+  });
 });
