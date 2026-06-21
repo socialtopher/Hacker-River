@@ -210,7 +210,7 @@ final class FeedViewModel {
 
     /// Order ids by the river sort. Rank keeps merge order (≈ HN rank, Top first);
     /// newest puts higher item ids (more recent) first.
-    static func sorted(_ ids: [Int], by sort: RiverSort) -> [Int] {
+    nonisolated static func sorted(_ ids: [Int], by sort: RiverSort) -> [Int] {
         switch sort {
         case .rank: return ids
         case .newest: return ids.sorted(by: >)
@@ -236,7 +236,7 @@ final class FeedViewModel {
     private func mergeIDs(_ groups: [[Int]]) -> [Int] { Self.mergeStoryIDs(groups) }
 
     /// Dedupe across sources, preserving first-seen order. Port of `mergeStoryIds`.
-    static func mergeStoryIDs(_ groups: [[Int]]) -> [Int] {
+    nonisolated static func mergeStoryIDs(_ groups: [[Int]]) -> [Int] {
         var seen = Set<Int>()
         var merged: [Int] = []
         for group in groups {
