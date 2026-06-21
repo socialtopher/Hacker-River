@@ -95,3 +95,29 @@ Verification performed:
 
 Remaining risks or follow-ups:
 - Deployment and live-site validation remain blocked until someone pushes `main` and checks the built site.
+
+## 2026-06-21 - Native app port (SwiftUI, forked from Ember)
+
+Summary of changes:
+- Removed the React/Vite web app and vendored Ember (DatanoiseTV, MIT) as the
+  native SwiftUI base for iPhone/iPad/Mac.
+- Ported the river ledger to `RiverStore` (seen/read/dismissed + TTLs, read
+  snapshots) and rebuilt feed construction in `FeedViewModel` (merged sources,
+  ledger filtering, inbox count, new-post banner, rank/newest sort).
+- Added the inbox count, "N new posts" banner, swipe-to-dismiss, a Recently Read
+  tab/column, and river settings; rebranded throughout.
+- Added an XcodeGen unit-test target with XCTest ports of the web tests, and a
+  macOS Xcode build/test GitHub Actions workflow (replacing the npm Pages one).
+
+Files changed:
+- Whole `Sources/`, `Resources/`, `Tests/`, `project.yml`, `.github/workflows/`,
+  plus `README.md`, `BUILD.md`, `ATTRIBUTION.md`, `DECISIONS.md`,
+  `XCODE_BOOTSTRAP.md`.
+
+Verification performed:
+- None — Linux container has no Swift/Xcode toolchain. Code is complete and
+  internally consistent; first compile happens on the Mac. See DECISIONS.md #18.
+
+Remaining risks or follow-ups:
+- Build/run/test on a Mac (BUILD.md); expect minor first-compile fixups. Use the
+  hand-off prompt in XCODE_BOOTSTRAP.md.

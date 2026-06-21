@@ -12,10 +12,13 @@ Do not make broad rewrites unless explicitly instructed. Prefer small, safe, inc
 
 ## Open Tasks
 
-None.
+None. (Next step is on the Mac: build/test in Xcode — see BUILD.md.)
 
 ## Closed Tasks
 
+5. Make Hacker River a native app by adapting its features on top of Ember
+   (DatanoiseTV's SwiftUI HN client). Forked Ember, deleted the web app, and
+   ported the river engine natively. See DECISIONS.md and ACTION-LOG (2026-06-21).
 1. I've dropped favicon.svg into the repo folder. Set it up as the favicon of the site.
 2. Inspect the font actually used on hacker news and update the hacker river font to match (as long as there's not a copyright issue; if so, choose a similar alternative)
 3. Using this context: "Current sorting:
