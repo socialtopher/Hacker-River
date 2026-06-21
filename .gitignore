@@ -1,9 +1,23 @@
-node_modules/
-dist/
+# Generated Xcode project (regenerate with `xcodegen generate`)
+HackerRiver.xcodeproj/
+Ember.xcodeproj/
+
+# Xcode build artifacts
+build/
+DerivedData/
+.swiftpm/
+*.xcworkspace
+xcuserdata/
+*.xcuserstate
+
+# macOS
 .DS_Store
-*.local
+
+# Misc
 *.log
-coverage/
-.env
-.env.*
-!.env.example
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Personal drafts — never commit
+HN_SUBMISSION.txt
