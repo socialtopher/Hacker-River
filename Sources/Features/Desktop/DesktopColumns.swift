@@ -1,15 +1,26 @@
 import SwiftUI
 
-/// A single feed rendered as a selectable list for the desktop middle column.
+/// A feed (the river, or a single HN feed) rendered as a selectable list for the
+/// desktop middle column.
 struct DesktopFeedColumn: View {
-    let feed: Feed
+    let mode: FeedMode
     @Binding var selection: HNItem?
     @State private var vm: FeedViewModel
 
-    init(feed: Feed, selection: Binding<HNItem?>) {
-        self.feed = feed
+    @Environment(RiverStore.self) private var river
+    @Environment(SettingsStore.self) private var settings
+    @Environment(BookmarkStore.self) private var bookmarks
+
+    init(mode: FeedMode, selection: Binding<HNItem?>) {
+        self.mode = mode
         _selection = selection
-        _vm = State(initialValue: FeedViewModel(feed: feed))
+        _vm = State(initialValue: FeedViewModel(mode: mode))
+    }
+
+    private var navTitle: String {
+        guard case .river = mode else { return mode.title }
+        let count = vm.inboxCount
+        return count > 0 ? "Hacker River (\(count))" : "Hacker River"
     }
 
     var body: some View {
@@ -24,20 +35,49 @@ struct DesktopFeedColumn: View {
                 list
             }
         }
-        .navigationTitle(feed.title)
+        .navigationTitle(navTitle)
         .background(Theme.background)
-        .task { await vm.startIfNeeded() }
+        .task {
+            vm.configure(river: river, settings: settings)
+            await vm.startIfNeeded()
+        }
     }
 
     private var list: some View {
         List(selection: $selection) {
-            ForEach(Array(vm.stories.enumerated()), id: \.element.id) { index, story in
-                StoryRow(item: story, rank: index + 1)
-                    .tag(story)
-                    .listRowSeparatorTint(Theme.separator)
-                    .task {
-                        if vm.shouldLoadMore(at: story) { await vm.loadNextPage() }
+            if vm.visibleStories.isEmpty {
+                ContentUnavailableView {
+                    Label("The river is calm", systemImage: "checkmark.circle")
+                } description: {
+                    Text("You're all caught up.")
+                }
+            }
+            ForEach(Array(vm.visibleStories.enumerated()), id: \.element.id) { index, story in
+                StoryRow(item: story, rank: index + 1) {
+                    withAnimation { vm.dismiss(story) }
+                }
+                .tag(story)
+                .listRowSeparatorTint(Theme.separator)
+                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                    Button {
+                        bookmarks.toggle(story)
+                    } label: {
+                        Label(bookmarks.isBookmarked(story) ? "Unsave" : "Save",
+                              systemImage: bookmarks.isBookmarked(story) ? "bookmark.slash.fill" : "bookmark.fill")
                     }
+                    .tint(Theme.upvote)
+                }
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    Button {
+                        withAnimation { vm.dismiss(story) }
+                    } label: {
+                        Label("Dismiss", systemImage: "checkmark")
+                    }
+                    .tint(Theme.positive)
+                }
+                .task {
+                    if vm.shouldLoadMore(at: story) { await vm.loadNextPage() }
+                }
             }
             if vm.isLoadingMore {
                 ProgressView()
@@ -49,6 +89,49 @@ struct DesktopFeedColumn: View {
         .scrollContentBackground(.hidden)
         .background(Theme.background)
         .refreshable { await vm.reload() }
+    }
+}
+
+/// Recently read stories for the desktop middle column.
+struct DesktopRecentlyReadColumn: View {
+    @Environment(RiverStore.self) private var river
+    @Environment(SettingsStore.self) private var settings
+    @Binding var selection: HNItem?
+
+    private var items: [HNItem] {
+        river.recentlyRead(now: Date(), tappedTTL: settings.tappedTTL)
+    }
+
+    var body: some View {
+        Group {
+            if items.isEmpty {
+                ContentUnavailableView {
+                    Label("Nothing read yet", systemImage: "book.closed")
+                } description: {
+                    Text("Stories you open will appear here.")
+                }
+            } else {
+                List(selection: $selection) {
+                    ForEach(items) { story in
+                        StoryRow(item: story)
+                            .tag(story)
+                            .listRowSeparatorTint(Theme.separator)
+                            .swipeActions {
+                                Button(role: .destructive) {
+                                    river.markDismissed(story.id)
+                                } label: {
+                                    Label("Remove", systemImage: "xmark")
+                                }
+                            }
+                    }
+                }
+                .listStyle(.inset)
+                .scrollContentBackground(.hidden)
+                .background(Theme.background)
+            }
+        }
+        .navigationTitle("Recently Read")
+        .background(Theme.background)
     }
 }
 

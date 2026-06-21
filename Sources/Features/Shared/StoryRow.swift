@@ -6,10 +6,13 @@ import SwiftUI
 struct StoryRow: View {
     let item: HNItem
     var rank: Int?
+    /// Optional "dismiss" (✓) action; when provided, exposed via context menu and
+    /// VoiceOver so the river can be tended without swiping.
+    var onDismiss: (() -> Void)?
 
     @Environment(SettingsStore.self) private var settings
     @Environment(BookmarkStore.self) private var bookmarks
-    @Environment(ReadStore.self) private var readStore
+    @Environment(RiverStore.self) private var readStore
     @Environment(\.openArticle) private var openArticle
     @Environment(\.accessibilityDifferentiateWithoutColor) private var systemDiffNoColor
     @Environment(\.dynamicTypeSize) private var typeSize
@@ -133,11 +136,17 @@ struct StoryRow: View {
 
     @ViewBuilder private var rowActions: some View {
         if let url = item.articleURL {
-            Button("Open Link") { openArticle(url) }
+            Button("Open Link") {
+                readStore.markTapped(item)
+                openArticle(url)
+            }
         }
         Button(isSaved ? "Remove from Saved" : "Save") {
             bookmarks.toggle(item)
             Haptics.soft()
+        }
+        if let onDismiss {
+            Button("Dismiss") { onDismiss() }
         }
         if let url = item.articleURL ?? Optional(item.hnURL) {
             ShareLink(item: url) { Text("Share") }
@@ -147,6 +156,7 @@ struct StoryRow: View {
     @ViewBuilder private var contextMenu: some View {
         if let url = item.articleURL {
             Button {
+                readStore.markTapped(item)
                 openArticle(url)
             } label: {
                 Label("Open Link", systemImage: "safari")
@@ -178,9 +188,16 @@ struct StoryRow: View {
             }
         } else {
             Button {
-                readStore.markRead(item.id)
+                readStore.markTapped(item)
             } label: {
                 Label("Mark as Read", systemImage: "checkmark.circle")
+            }
+        }
+        if let onDismiss {
+            Button(role: .destructive) {
+                onDismiss()
+            } label: {
+                Label("Dismiss", systemImage: "checkmark")
             }
         }
     }

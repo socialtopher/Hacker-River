@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Three-pane desktop / large-iPad layout: a source-list sidebar (feeds +
+/// Three-pane desktop / large-iPad layout: a source-list sidebar (river, feeds +
 /// library), a story list, and the discussion detail. Reuses the same rows,
 /// detail view, and view models as the iPhone layout.
 struct DesktopRootView: View {
@@ -8,15 +8,16 @@ struct DesktopRootView: View {
 
     // Optional so the single-selection `List(selection:)` resolves to the
     // iOS/Catalyst-available initializer.
-    @State private var section: DesktopSection? = .feed(.top)
+    @State private var section: DesktopSection? = .mode(.river)
     @State private var selectedStory: HNItem?
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var showSettings = false
     @State private var didInit = false
 
     enum DesktopSection: Hashable {
-        case feed(Feed)
+        case mode(FeedMode)
         case search
+        case recentlyRead
         case saved
     }
 
@@ -37,10 +38,10 @@ struct DesktopRootView: View {
         .onAppear {
             guard !didInit else { return }
             didInit = true
-            section = .feed(settings.defaultFeed)
             #if DEBUG
             switch LaunchArgs.initialTab {
             case "search": section = .search
+            case "read": section = .recentlyRead
             case "saved": section = .saved
             default: break
             }
@@ -52,20 +53,26 @@ struct DesktopRootView: View {
 
     private var sidebar: some View {
         List(selection: $section) {
+            Section("River") {
+                Label("Hacker River", systemImage: "water.waves")
+                    .tag(DesktopSection.mode(.river))
+            }
             Section("Feeds") {
                 ForEach(Feed.allCases) { feed in
                     Label(feed.title, systemImage: feed.systemImage)
-                        .tag(DesktopSection.feed(feed))
+                        .tag(DesktopSection.mode(.feed(feed)))
                 }
             }
             Section("Library") {
                 Label("Search", systemImage: "magnifyingglass")
                     .tag(DesktopSection.search)
+                Label("Recently Read", systemImage: "book")
+                    .tag(DesktopSection.recentlyRead)
                 Label("Saved", systemImage: "bookmark")
                     .tag(DesktopSection.saved)
             }
         }
-        .navigationTitle("Ember")
+        .navigationTitle("Hacker River")
         .navigationSplitViewColumnWidth(min: 208, ideal: 240, max: 300)
         .toolbar {
             ToolbarItem {
@@ -85,15 +92,17 @@ struct DesktopRootView: View {
     @ViewBuilder private var middleColumn: some View {
         Group {
             switch section {
-            case .feed(let feed):
-                DesktopFeedColumn(feed: feed, selection: $selectedStory)
-                    .id(feed)
+            case .mode(let mode):
+                DesktopFeedColumn(mode: mode, selection: $selectedStory)
+                    .id(mode)
             case .search:
                 DesktopSearchColumn(selection: $selectedStory)
+            case .recentlyRead:
+                DesktopRecentlyReadColumn(selection: $selectedStory)
             case .saved:
                 DesktopSavedColumn(selection: $selectedStory)
             case .none:
-                DesktopFeedColumn(feed: .top, selection: $selectedStory)
+                DesktopFeedColumn(mode: .river, selection: $selectedStory)
             }
         }
         .navigationSplitViewColumnWidth(min: 320, ideal: 380, max: 520)

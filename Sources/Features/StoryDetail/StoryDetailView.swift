@@ -8,7 +8,7 @@ struct StoryDetailView: View {
 
     @Environment(SettingsStore.self) private var settings
     @Environment(BookmarkStore.self) private var bookmarks
-    @Environment(ReadStore.self) private var readStore
+    @Environment(RiverStore.self) private var readStore
     @Environment(\.openArticle) private var openArticle
     @Environment(\.openURL) private var openURL
 
@@ -34,7 +34,7 @@ struct StoryDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { toolbar }
         .task {
-            if settings.markReadOnOpen { readStore.markRead(item.id) }
+            if settings.markReadOnOpen { readStore.markTapped(item) }
             await vm.load()
         }
     }
@@ -260,7 +260,7 @@ struct StoryDetailView: View {
                         Label("Mark as Unread", systemImage: "circle")
                     }
                 } else {
-                    Button { readStore.markRead(item.id) } label: {
+                    Button { readStore.markTapped(story) } label: {
                         Label("Mark as Read", systemImage: "checkmark.circle")
                     }
                 }

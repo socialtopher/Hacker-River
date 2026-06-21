@@ -58,18 +58,21 @@ struct RootView: View {
 
 /// iPhone layout: a tab bar with an independent navigation stack per tab.
 struct MobileRootView: View {
-    @State private var selectedTab: Tab = .stories
+    @State private var selectedTab: Tab = .river
 
-    enum Tab: Hashable { case stories, search, saved, settings }
+    enum Tab: Hashable { case river, search, read, saved, settings }
 
     var body: some View {
         TabView(selection: $selectedTab) {
             FeedView()
-                .tabItem { Label("Stories", systemImage: "flame.fill") }
-                .tag(Tab.stories)
+                .tabItem { Label("River", systemImage: "water.waves") }
+                .tag(Tab.river)
             SearchView()
                 .tabItem { Label("Search", systemImage: "magnifyingglass") }
                 .tag(Tab.search)
+            RecentlyReadView()
+                .tabItem { Label("Read", systemImage: "book.fill") }
+                .tag(Tab.read)
             SavedView()
                 .tabItem { Label("Saved", systemImage: "bookmark.fill") }
                 .tag(Tab.saved)
@@ -81,6 +84,7 @@ struct MobileRootView: View {
             #if DEBUG
             switch LaunchArgs.initialTab {
             case "search": selectedTab = .search
+            case "read": selectedTab = .read
             case "saved": selectedTab = .saved
             case "settings": selectedTab = .settings
             default: break

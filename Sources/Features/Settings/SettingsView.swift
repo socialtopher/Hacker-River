@@ -2,7 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(SettingsStore.self) private var settings
-    @Environment(ReadStore.self) private var readStore
+    @Environment(RiverStore.self) private var readStore
     @Environment(BookmarkStore.self) private var bookmarks
     @Environment(\.openURL) private var openURL
 
@@ -15,6 +15,7 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 appearanceSection($settings)
+                riverSection($settings)
                 readingSection($settings)
                 accessibilitySection($settings)
                 personalizeSection
@@ -47,6 +48,70 @@ struct SettingsView: View {
                 AccentPicker(selection: settings.accent)
             }
             .padding(.vertical, Spacing.s)
+        }
+    }
+
+    // MARK: River
+
+    private func riverSection(_ settings: Bindable<SettingsStore>) -> some View {
+        Section {
+            Picker(selection: settings.autoRefreshMinutes) {
+                Text("1 min").tag(1)
+                Text("5 min").tag(5)
+                Text("15 min").tag(15)
+                Text("30 min").tag(30)
+                Text("Off").tag(0)
+            } label: {
+                Label("Auto-Refresh", systemImage: "arrow.clockwise")
+            }
+
+            Picker(selection: settings.riverSort) {
+                ForEach(RiverSort.allCases) { sort in
+                    Label(sort.title, systemImage: sort.systemImage).tag(sort)
+                }
+            } label: {
+                Label("Sort River By", systemImage: "arrow.up.arrow.down")
+            }
+
+            Picker(selection: settings.unseenTTLHours) {
+                Text("30 min").tag(0.5)
+                Text("1 hour").tag(1.0)
+                Text("2 hours").tag(2.0)
+                Text("4 hours").tag(4.0)
+            } label: {
+                Label("Keep Unread For", systemImage: "hourglass")
+            }
+
+            Picker(selection: settings.tappedTTLDays) {
+                Text("1 day").tag(1)
+                Text("3 days").tag(3)
+                Text("5 days").tag(5)
+                Text("7 days").tag(7)
+            } label: {
+                Label("Keep Read For", systemImage: "calendar")
+            }
+        } header: {
+            Text("River")
+        } footer: {
+            Text("Unread stories flow out of the feed after the time above; stories you open move to Recently Read until they expire. Dismissed stories never return.")
+        }
+
+        Section {
+            ForEach(Feed.allCases) { feed in
+                Toggle(isOn: Binding(
+                    get: { settings.wrappedValue.riverSources.contains(feed) },
+                    set: { isOn in
+                        if isOn { settings.wrappedValue.riverSources.insert(feed) }
+                        else { settings.wrappedValue.riverSources.remove(feed) }
+                    }
+                )) {
+                    Label(feed.title, systemImage: feed.systemImage)
+                }
+            }
+        } header: {
+            Text("River Sources")
+        } footer: {
+            Text("Which Hacker News feeds are merged into the river.")
         }
     }
 
@@ -120,15 +185,15 @@ struct SettingsView: View {
             Button(role: .destructive) {
                 confirmClearRead = true
             } label: {
-                Label("Clear Read History", systemImage: "eye.slash")
+                Label("Reset River History", systemImage: "arrow.counterclockwise")
             }
-            .confirmationDialog("Clear read history?", isPresented: $confirmClearRead, titleVisibility: .visible) {
-                Button("Clear", role: .destructive) {
+            .confirmationDialog("Reset the river?", isPresented: $confirmClearRead, titleVisibility: .visible) {
+                Button("Reset", role: .destructive) {
                     readStore.clear()
                     Haptics.warning()
                 }
             } message: {
-                Text("Stories will no longer appear as read.")
+                Text("Clears the seen, read, and dismissed ledger. Every story will appear fresh again.")
             }
 
             HStack {

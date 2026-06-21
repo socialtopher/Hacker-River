@@ -1,21 +1,24 @@
 import SwiftUI
 
-/// Horizontal, pinned feed selector. Each chip pairs an icon with a label so
-/// selection never relies on color alone, and exposes the `.isSelected` trait
-/// to VoiceOver.
+/// Horizontal, pinned source selector. The first chip is the merged River; the
+/// rest focus a single Hacker News feed. Each chip pairs an icon with a label so
+/// selection never relies on color alone, and exposes the `.isSelected` trait to
+/// VoiceOver.
 struct FeedChipBar: View {
-    let selection: Feed
-    let onSelect: (Feed) -> Void
+    let selection: FeedMode
+    let onSelect: (FeedMode) -> Void
 
     @Environment(SettingsStore.self) private var settings
+
+    private var modes: [FeedMode] { [.river] + Feed.allCases.map(FeedMode.feed) }
 
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Spacing.s) {
-                    ForEach(Feed.allCases) { feed in
-                        chip(feed)
-                            .id(feed)
+                    ForEach(modes, id: \.self) { mode in
+                        chip(mode)
+                            .id(mode)
                     }
                 }
                 .padding(.horizontal, Spacing.l)
@@ -31,15 +34,15 @@ struct FeedChipBar: View {
         }
     }
 
-    private func chip(_ feed: Feed) -> some View {
-        let isSelected = feed == selection
+    private func chip(_ mode: FeedMode) -> some View {
+        let isSelected = mode == selection
         return Button {
-            onSelect(feed)
+            onSelect(mode)
         } label: {
             HStack(spacing: 5) {
-                Image(systemName: feed.systemImage)
+                Image(systemName: mode.systemImage)
                     .font(.system(size: 11, weight: .semibold))
-                Text(feed.shortTitle)
+                Text(mode.shortTitle)
                     .font(.system(.subheadline, design: .rounded).weight(.semibold))
             }
             .padding(.horizontal, Spacing.m)
@@ -55,7 +58,7 @@ struct FeedChipBar: View {
             )
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(feed.title)
+        .accessibilityLabel(mode.title)
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 }

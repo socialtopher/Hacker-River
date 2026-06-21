@@ -1,5 +1,23 @@
 import SwiftUI
 
+/// How the live river feed is ordered.
+enum RiverSort: String, CaseIterable, Identifiable, Codable {
+    case rank, newest
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .rank: "HN Rank"
+        case .newest: "Newest"
+        }
+    }
+    var systemImage: String {
+        switch self {
+        case .rank: "flame"
+        case .newest: "clock"
+        }
+    }
+}
+
 enum AppAppearance: String, CaseIterable, Identifiable, Codable {
     case system, light, dark
     var id: String { rawValue }
@@ -70,10 +88,46 @@ final class SettingsStore {
         didSet { store(showRankNumbers, .showRankNumbers) }
     }
 
+    // MARK: River
+
+    /// Background auto-refresh interval in minutes; `0` means off.
+    var autoRefreshMinutes: Int {
+        didSet { store(autoRefreshMinutes, .autoRefreshMinutes) }
+    }
+    /// How long an untapped story stays in the feed after first being seen.
+    var unseenTTLHours: Double {
+        didSet { store(unseenTTLHours, .unseenTTLHours) }
+    }
+    /// How long a tapped story stays in Recently Read.
+    var tappedTTLDays: Int {
+        didSet { store(tappedTTLDays, .tappedTTLDays) }
+    }
+    /// Ordering of the live river feed.
+    var riverSort: RiverSort {
+        didSet { store(riverSort.rawValue, .riverSort) }
+    }
+    /// Which HN feeds are merged into the river. Persisted as raw strings.
+    var riverSources: Set<Feed> {
+        didSet { store(riverSources.map(\.rawValue), .riverSources) }
+    }
+
+    /// Unseen TTL as a duration.
+    var unseenTTL: TimeInterval { unseenTTLHours * 3600 }
+    /// Tapped TTL as a duration.
+    var tappedTTL: TimeInterval { Double(tappedTTLDays) * 86_400 }
+
+    /// The river's feeds in canonical order, falling back to Top if empty.
+    var orderedRiverSources: [Feed] {
+        let ordered = Feed.allCases.filter { riverSources.contains($0) }
+        return ordered.isEmpty ? [.top] : ordered
+    }
+
     /// Whether the first-run personalization flow has been completed.
     var hasCompletedOnboarding: Bool {
         didSet { store(hasCompletedOnboarding, .onboarded) }
     }
+
+    static let defaultRiverSources: Set<Feed> = [.top, .new, .ask, .show, .job]
 
     private let defaults: UserDefaults
 
@@ -89,6 +143,16 @@ final class SettingsStore {
         underlineLinks = defaults.object(forKey: Key.underlineLinks.rawValue) as? Bool ?? true
         distinguishWithoutColor = defaults.object(forKey: Key.distinguishWithoutColor.rawValue) as? Bool ?? false
         showRankNumbers = defaults.object(forKey: Key.showRankNumbers.rawValue) as? Bool ?? true
+        autoRefreshMinutes = defaults.object(forKey: Key.autoRefreshMinutes.rawValue) as? Int ?? 5
+        unseenTTLHours = defaults.object(forKey: Key.unseenTTLHours.rawValue) as? Double ?? 1
+        tappedTTLDays = defaults.object(forKey: Key.tappedTTLDays.rawValue) as? Int ?? 5
+        riverSort = RiverSort(rawValue: defaults.string(forKey: Key.riverSort.rawValue) ?? "") ?? .rank
+        if let raw = defaults.array(forKey: Key.riverSources.rawValue) as? [String] {
+            let parsed = Set(raw.compactMap(Feed.init(rawValue:)))
+            riverSources = parsed.isEmpty ? SettingsStore.defaultRiverSources : parsed
+        } else {
+            riverSources = SettingsStore.defaultRiverSources
+        }
         hasCompletedOnboarding = defaults.object(forKey: Key.onboarded.rawValue) as? Bool ?? false
         Haptics.isEnabled = hapticsEnabled
     }
@@ -104,6 +168,11 @@ final class SettingsStore {
         case underlineLinks = "settings.underlineLinks"
         case distinguishWithoutColor = "settings.distinguishWithoutColor"
         case showRankNumbers = "settings.showRankNumbers"
+        case autoRefreshMinutes = "settings.autoRefreshMinutes"
+        case unseenTTLHours = "settings.unseenTTLHours"
+        case tappedTTLDays = "settings.tappedTTLDays"
+        case riverSort = "settings.riverSort"
+        case riverSources = "settings.riverSources"
         case onboarded = "settings.hasCompletedOnboarding"
     }
 

@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 /// First-run personalization. The "smart" part: on appear it inspects the
-/// device's appearance and accessibility settings and pre-configures Ember to
+/// device's appearance and accessibility settings and pre-configures Hacker River to
 /// match, then explains what it tuned. Every choice updates the app — and the
 /// live preview — immediately.
 struct OnboardingView: View {
@@ -94,10 +94,10 @@ struct OnboardingView: View {
                 .accessibilityHidden(true)
 
                 VStack(spacing: Spacing.s) {
-                    Text("Welcome to Ember")
+                    Text("Welcome to Hacker River")
                         .font(.system(.largeTitle, design: .rounded).weight(.bold))
                         .multilineTextAlignment(.center)
-                    Text("A calmer way to read Hacker News. Let's tune it to you — it takes about 20 seconds.")
+                    Text("Hacker News as a river: new stories flow in, the ones you skip flow out, and you never re-scan the same post. Let's tune it to you — it takes about 20 seconds.")
                         .font(.body)
                         .foregroundStyle(Theme.textSecondary)
                         .multilineTextAlignment(.center)
@@ -191,7 +191,7 @@ struct OnboardingView: View {
     private func feedStep(_ settings: Bindable<SettingsStore>) -> some View {
         StepScaffold {
             VStack(spacing: Spacing.l) {
-                StepHeader(title: "Where should we start?", subtitle: "Your home feed when you open Ember. You can switch anytime.")
+                StepHeader(title: "Where should we start?", subtitle: "Your default feed; the river merges your sources. You can switch anytime.")
                 VStack(spacing: Spacing.s) {
                     ForEach(Feed.allCases) { feed in
                         FeedChoiceRow(
@@ -217,7 +217,7 @@ struct OnboardingView: View {
                 StepHeader(
                     title: "Tuned for you",
                     subtitle: detected.isEmpty
-                        ? "Ember never relies on color alone. Adjust anything below."
+                        ? "Hacker River never relies on color alone. Adjust anything below."
                         : "We matched these to your device settings — change anything you like."
                 )
 
@@ -277,7 +277,7 @@ struct OnboardingView: View {
                 VStack(spacing: Spacing.s) {
                     Text("You're all set")
                         .font(.system(.largeTitle, design: .rounded).weight(.bold))
-                    Text("Ember is tuned to your taste. You can change anything later in Settings.")
+                    Text("Hacker River is tuned to your taste. You can change anything later in Settings.")
                         .font(.body)
                         .foregroundStyle(Theme.textSecondary)
                         .multilineTextAlignment(.center)
