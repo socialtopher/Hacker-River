@@ -56,9 +56,11 @@ struct SearchView: View {
                         NavigationLink(value: story) { EmptyView() }.opacity(0)
                         StoryRow(item: story)
                     }
-                    .listRowInsets(EdgeInsets(top: 0, leading: Spacing.l, bottom: 0, trailing: Spacing.l))
-                    .listRowSeparatorTint(Theme.separator)
-                    .listRowBackground(Theme.background)
+                    .padding(.horizontal, Spacing.l)
+                    .riverGlassCard()
+                    .listRowInsets(EdgeInsets(top: Spacing.xs, leading: 0, bottom: Spacing.xs, trailing: 0))
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
                 }
             } header: {
                 modePicker
@@ -67,6 +69,7 @@ struct SearchView: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background(Theme.background)
+        .contentMargins(.vertical, Spacing.s, for: .scrollContent)
     }
 
     private var modePicker: some View {
@@ -120,10 +123,8 @@ private struct FlowChips: View {
                         .font(.subheadline.weight(.medium))
                         .padding(.horizontal, Spacing.m)
                         .padding(.vertical, Spacing.s)
-                        .background(Theme.surface)
                         .foregroundStyle(Theme.textPrimary)
-                        .clipShape(Capsule())
-                        .overlay(Capsule().strokeBorder(Theme.separator, lineWidth: 1))
+                        .riverGlassCapsule(interactive: true)
                 }
                 .buttonStyle(.plain)
             }

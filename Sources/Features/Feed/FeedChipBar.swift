@@ -22,16 +22,13 @@ struct FeedChipBar: View {
                     }
                 }
                 .padding(.horizontal, Spacing.l)
-                .padding(.vertical, Spacing.m)
+                .padding(.vertical, Spacing.s)
             }
             .onChange(of: selection) { _, newValue in
                 withAnimation(.easeInOut) { proxy.scrollTo(newValue, anchor: .center) }
             }
         }
-        .background(.bar)
-        .overlay(alignment: .bottom) {
-            Divider().background(Theme.hairline)
-        }
+        .background(.clear)
     }
 
     private func chip(_ mode: FeedMode) -> some View {
@@ -47,15 +44,9 @@ struct FeedChipBar: View {
             }
             .padding(.horizontal, Spacing.m)
             .padding(.vertical, 9)
-            .foregroundStyle(isSelected ? Color.white : Theme.textSecondary)
-            .background(
-                Capsule(style: .continuous)
-                    .fill(isSelected ? settings.accent.color : Theme.surface)
-            )
-            .overlay(
-                Capsule(style: .continuous)
-                    .strokeBorder(isSelected ? Color.clear : Theme.separator, lineWidth: 1)
-            )
+            .foregroundStyle(isSelected ? Color.white : Theme.textPrimary)
+            .background(isSelected ? settings.accent.color : Color.clear, in: Capsule(style: .continuous))
+            .riverGlassCapsule(interactive: true)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(mode.title)
