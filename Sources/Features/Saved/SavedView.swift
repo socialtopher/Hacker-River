@@ -48,9 +48,11 @@ struct SavedView: View {
                     NavigationLink(value: story) { EmptyView() }.opacity(0)
                     StoryRow(item: story)
                 }
-                .listRowInsets(EdgeInsets(top: 0, leading: Spacing.l, bottom: 0, trailing: Spacing.l))
-                .listRowSeparatorTint(Theme.separator)
-                .listRowBackground(Theme.background)
+                .padding(.horizontal, Spacing.l)
+                .riverGlassCard()
+                .listRowInsets(EdgeInsets(top: Spacing.xs, leading: 0, bottom: Spacing.xs, trailing: 0))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                     Button(role: .destructive) {
                         withAnimation { bookmarks.remove(story.id) }
@@ -64,5 +66,6 @@ struct SavedView: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background(Theme.background)
+        .contentMargins(.vertical, Spacing.s, for: .scrollContent)
     }
 }

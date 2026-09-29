@@ -44,6 +44,8 @@ struct FeedView: View {
                             }
                         }
                     }
+                    .padding(.bottom, Spacing.xs)
+                    .background(.ultraThinMaterial)
                 }
                 .navigationDestination(for: HNItem.self) { StoryDetailView(item: $0) }
                 .navigationDestination(for: UserRoute.self) { UserView(username: $0.username) }
@@ -121,9 +123,11 @@ struct FeedView: View {
                         Haptics.soft()
                     }
                 }
-                .listRowInsets(EdgeInsets(top: 0, leading: Spacing.l, bottom: 0, trailing: Spacing.l))
-                .listRowSeparatorTint(Theme.separator)
-                .listRowBackground(Theme.background)
+                .padding(.horizontal, Spacing.l)
+                .riverGlassCard()
+                .listRowInsets(EdgeInsets(top: Spacing.xs, leading: 0, bottom: Spacing.xs, trailing: 0))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
                 .swipeActions(edge: .leading, allowsFullSwipe: true) {
                     Button {
                         bookmarks.toggle(story)
@@ -163,6 +167,7 @@ struct FeedView: View {
         .scrollContentBackground(.hidden)
         .background(Theme.background)
         .refreshable { await vm.reload() }
+        .contentMargins(.vertical, Spacing.s, for: .scrollContent)
     }
 }
 
@@ -181,11 +186,14 @@ struct NewPostsBanner: View {
                     .font(.system(.footnote, design: .rounded).weight(.semibold))
             }
             .foregroundStyle(.white)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, Spacing.s)
-            .background(Theme.upvote)
+            .padding(.horizontal, Spacing.l)
+            .padding(.vertical, 10)
+            .background(Theme.upvote, in: Capsule(style: .continuous))
+            .riverGlassCapsule(interactive: true)
         }
         .buttonStyle(.plain)
+        .padding(.horizontal, Spacing.l)
+        .padding(.bottom, Spacing.xs)
         .accessibilityLabel("\(count) new posts. Tap to load.")
         .transition(.move(edge: .top).combined(with: .opacity))
     }
